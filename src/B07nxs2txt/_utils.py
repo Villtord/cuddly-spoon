@@ -8,13 +8,8 @@ GLOBAL_NODE_OLD = "/entry1/instrument"
 GLOBAL_NODE_NEW = "/entry/instrument"
 CLASSIFICATIION_NODE_NEW = "/entry/diamond_scan/scan_fields"
 
-# dev config
-WORKSPACE = "/workspaces/nxs2txtB07/src/B07nxs2txt/"
-## main config
-# WORKSPACE = "/dls_sw/b07/scripts/Data_Handling/universal_script/"
-
-SCRIPT_OLD = WORKSPACE + "b07_convert_old.py"
-SCRIPT_NEW = WORKSPACE + "b07_convert_new.py"
+SCRIPT_OLD = "B07nxs2txt.scripts.b07_convert_old"
+SCRIPT_NEW = "B07nxs2txt.scripts.b07_convert_new"
 
 
 class ScanType(Enum):

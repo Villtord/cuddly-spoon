@@ -50,9 +50,9 @@ def run_script_with_python(file_path: str, script: str):
     result = None
     try:
         if parsed_args.titles_on:
-            command = f"python {script} {file_path} --titles_on"
+            command = f"python -m {script} {file_path} --titles_on"
         else:
-            command = f"python {script} {file_path}"
+            command = f"python -m {script} {file_path}"
         result = subprocess.run(
             command, shell=True, check=True, capture_output=True, text=True
         )
