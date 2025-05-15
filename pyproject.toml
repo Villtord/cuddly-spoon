@@ -37,7 +37,7 @@ dev = [
 B07-nxs2txt = "B07nxs2txt.__main__:main"
 
 [project.urls]
-GitHub = "https://github.com/Villtord/B07-nxs2txt"
+GitHub = "https://github.com/Villtord/cuddly-spoon"
 
 [[project.authors]] # Further authors may be added by duplicating this section
 email = "villtord@proton.me"
