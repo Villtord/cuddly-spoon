@@ -1,0 +1,16 @@
+# Changes here will be overwritten by Copier
+_commit: 3.0.0
+_src_path: gh:DiamondLightSource/python-copier-template
+author_email: villtord@proton.me
+author_name: Victor Rogalev
+description: convertion script from nexus to txt for DLS B07 beamlines
+distribution_name: B07-nxs2txt
+docker: false
+docs_type: README
+git_platform: github.com
+github_org: Villtord
+package_name: B07nxs2txt
+pypi: true
+repo_name: B07-nxs2txt
+strict_typing: true
+type_checker: pyright
