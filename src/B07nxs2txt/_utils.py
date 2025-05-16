@@ -8,8 +8,8 @@ GLOBAL_NODE_OLD = "/entry1/instrument"
 GLOBAL_NODE_NEW = "/entry/instrument"
 CLASSIFICATIION_NODE_NEW = "/entry/diamond_scan/scan_fields"
 
-SCRIPT_OLD = "B07nxs2txt.scripts.b07_convert_old"
-SCRIPT_NEW = "B07nxs2txt.scripts.b07_convert_new"
+SCRIPT_OLD = "scripts.b07_convert_old"
+SCRIPT_NEW = "scripts.b07_convert_new"
 
 
 class ScanType(Enum):

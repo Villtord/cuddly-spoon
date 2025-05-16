@@ -1,17 +1,25 @@
 """Interface for ``python -m B07nxs2txt``."""
 
+import os
 import subprocess
+import sys
 from argparse import ArgumentParser, Namespace
 from collections.abc import Sequence
 
-from B07nxs2txt._utils import MAIN_NODE_NEW, MAIN_NODE_OLD, SCRIPT_NEW, SCRIPT_OLD
-from B07nxs2txt._version import __version__
+import h5py  # Assuming .nxs files are HDF5-compatible
+
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+from B07nxs2txt._utils import (  # noqa: E402
+    MAIN_NODE_NEW,
+    MAIN_NODE_OLD,
+    SCRIPT_NEW,
+    SCRIPT_OLD,
+)
+from B07nxs2txt._version import __version__  # noqa: E402
 
 __all__ = ["main"]
-
-import os
-
-import h5py  # Assuming .nxs files are HDF5-compatible
 
 errors: list[str] = []
 counter_old: int = 0
@@ -50,9 +58,9 @@ def run_script_with_python(file_path: str, script: str):
     result = None
     try:
         if parsed_args.titles_on:
-            command = f"python -m {script} {file_path} --titles_on"
+            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path} --titles_on"
         else:
-            command = f"python -m {script} {file_path}"
+            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path}"
         result = subprocess.run(
             command, shell=True, check=True, capture_output=True, text=True
         )

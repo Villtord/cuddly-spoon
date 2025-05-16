@@ -7,6 +7,21 @@
 
 convertion script from nexus to txt for DLS B07 beamlines
 
+If you use it from DLS without installing package:
+
+```
+module load python
+...
+
+python /dls_sw/b07/scripts/Data_Handling/universal_script/B07nxs2txt path_to_files --titles_on
+```
+
+If you use development container environment assuming venv is configured and activated:
+
+```
+ python -m B07nxs2txt --titles_on path_to_files
+```
+
 This is where you should write a short paragraph that describes what your module does,
 how it does it, and why people should use it.
 

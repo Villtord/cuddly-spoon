@@ -6,12 +6,20 @@ B07-92/B07-264 Script to convert .nxs files to plain text data files
 import argparse
 import csv
 import os
+import sys
 from argparse import Namespace
 from typing import Any
 
 import h5py
 
-from B07nxs2txt._utils import GLOBAL_NODE_OLD, ScanType, get_instrument_node
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(os.path.dirname(SCRIPT_DIR), ".."))
+
+from B07nxs2txt._utils import (  # noqa: E402
+    GLOBAL_NODE_OLD,
+    ScanType,
+    get_instrument_node,
+)
 
 NUMBER_FORMAT = "{0:.8g}"
 parsed_args: Namespace
