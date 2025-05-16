@@ -13,7 +13,7 @@ If you use it from DLS without installing package:
 module load python
 ...
 
-python /dls_sw/b07/scripts/Data_Handling/universal_script/B07nxs2txt path_to_files --titles_on
+python /dls_sw/b07/scripts/Data_Handling/cuddly-spoon/src/B07nxs2txt path_to_files --titles_on
 ```
 
 If you use development container environment assuming venv is configured and activated:
