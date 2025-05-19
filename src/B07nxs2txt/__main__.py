@@ -57,8 +57,8 @@ def run_script_with_python(file_path: str, script: str):
     """
     result = None
     try:
-        if parsed_args.titles_on:
-            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path} --titles_on"
+        if parsed_args.titles_off:
+            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path} --titles_off"
         else:
             command = f"cd {SCRIPT_DIR}; python -m {script} {file_path}"
         result = subprocess.run(
@@ -130,7 +130,7 @@ def main(args: Sequence[str] | None = None) -> None:
     )
     parser.add_argument("folderpath", help=("Full path to nxs folder to convert files"))
     parser.add_argument(
-        "--titles_on", help="Switch on column titles", action="store_true"
+        "--titles_off", help="Switch OFF column titles", action="store_true"
     )
 
     parsed_args = parser.parse_args()

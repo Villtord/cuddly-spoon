@@ -243,7 +243,7 @@ def write_data_out(filename: str, title_list: list[str], zipped: dict[str, Any])
     output_path = os.path.join(filedir, filename)
     with open(output_path, "w") as output_file:
         writer = csv.writer(output_file, delimiter="\t")
-        if parsed_args.titles_on:
+        if not parsed_args.titles_off:
             writer.writerow(title_list)
         writer.writerows(zipped)
 
@@ -266,7 +266,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("filepath", help=("Full path to nxs file to convert"))
     parser.add_argument(
-        "--titles_on", help="Switch on column titles", action="store_true"
+        "--titles_off", help="Switch OFF column titles", action="store_true"
     )
     parsed_args = parser.parse_args()
     main()
