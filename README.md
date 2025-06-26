@@ -13,13 +13,13 @@ If you use it from DLS without installing package:
 module load python
 ...
 
-python /dls_sw/b07/scripts/Data_Handling/cuddly-spoon/src/B07nxs2txt path_to_files --titles_on
+python /dls_sw/b07/scripts/Data_Handling/cuddly-spoon/src/B07nxs2txt path_to_files
 ```
 
 If you use development container environment assuming venv is configured and activated:
 
 ```
- python -m B07nxs2txt --titles_on path_to_files
+ python -m B07nxs2txt path_to_files
 ```
 
 This is where you should write a short paragraph that describes what your module does,
@@ -27,7 +27,6 @@ how it does it, and why people should use it.
 
 Source          | <https://github.com/Villtord/B07-nxs2txt>
 :---:           | :---:
-PyPI            | `pip install B07-nxs2txt`
 Releases        | <https://github.com/Villtord/B07-nxs2txt/releases>
 
 This is where you should put some images or code snippets that illustrate
@@ -35,13 +34,14 @@ some relevant examples. If it is a library then you might put some
 introductory code here:
 
 ```python
-from B07nxs2txt import __version__
+$ python -m B07nxs2txt --help
+usage: __main__.py [-h] [-v] [--titles_off] folderpath
 
-print(f"Hello B07nxs2txt {__version__}")
-```
+positional arguments:
+  folderpath     Full path to nxs folder to convert files
 
-Or if it is a commandline tool then you might put some example commands here:
-
-```
-python -m B07nxs2txt --version
+options:
+  -h, --help     show this help message and exit
+  -v, --version  show program's version number and exit
+  --titles_off   Switch OFF column titles
 ```
