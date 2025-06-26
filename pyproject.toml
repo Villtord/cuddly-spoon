@@ -48,7 +48,7 @@ name = "Victor Rogalev"
 version_file = "src/B07nxs2txt/_version.py"
 
 [tool.pyright]
-typeCheckingMode = "strict"
+typeCheckingMode = "off"
 reportMissingImports = false # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]

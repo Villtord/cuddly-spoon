@@ -101,7 +101,8 @@ def process_folder():
         print(f"No .nxs files found in the folder {parsed_args.folderpath}.")
         return
     for nxs_file in nxs_files:
-        file_path = os.path.join(parsed_args.folderpath, nxs_file)
+        print(os.path.abspath(parsed_args.folderpath))
+        file_path = os.path.join(os.path.abspath(parsed_args.folderpath), nxs_file)
         print("\n" + "#" * 50)
         print(f"Processing file: {file_path}")
         # Determine the Python version based on the main node
