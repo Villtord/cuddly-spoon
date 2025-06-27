@@ -5,22 +5,40 @@
 
 # B07nxs2txt
 
-convertion script from nexus to txt for DLS B07 beamlines
+Simple cli for converting nexus to txt files for DLS B07 beamlines.
 
-If you use it from DLS without installing package:
+If you use it from DLS do use module:
 
+```
+module load cuddle
+...
+
+cuddle path_to_files
+```
+
+This will load the default version of cuddle (cuddle/1.0) which is typically latest release, however there is a development version (on master branch) which can be invoked by:
+
+```
+module load cuddle/dev
+...
+
+cuddle path_to_files
+```
+
+All the above can be called directly within DLS network
 ```
 module load python
 ...
 
-python /dls_sw/b07/scripts/Data_Handling/cuddle/src/B07nxs2txt path_to_files
+python /dls_sw/b07/scripts/Data_Handling/cuddle/$version/src/B07nxs2txt path_to_files
 ```
 
-If you use development container environment assuming venv is configured and activated:
+If you use VSCode development container environment assuming venv is configured and activated:
 
 ```
  python -m B07nxs2txt path_to_files
 ```
+
 
 This is where you should write a short paragraph that describes what your module does,
 how it does it, and why people should use it.
