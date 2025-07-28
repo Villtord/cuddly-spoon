@@ -19,6 +19,7 @@ sys.path.append(os.path.join(os.path.dirname(SCRIPT_DIR), ".."))
 from B07nxs2txt._utils import (  # noqa: E402
     CLASSIFICATIION_NODE_NEW,
     GLOBAL_NODE_NEW,
+    NUMBER_FORMAT,
     PGM_NAMES,
     XY_SCAN_SCANNABLES_NAMES,
     ScanType,
@@ -26,7 +27,6 @@ from B07nxs2txt._utils import (  # noqa: E402
     get_instrument_node,
 )
 
-NUMBER_FORMAT = "{0:.8g}"
 parsed_args: Namespace
 filename: str
 filedir: str

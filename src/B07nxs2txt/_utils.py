@@ -14,6 +14,8 @@ SCRIPT_NEW = "scripts.b07_convert_new"
 PGM_NAMES = ("pgm_energy", "pgm_cff")
 XY_SCAN_SCANNABLES_NAMES = ("sm21b_x", "sm21b_y", "sm21b_z", "dummy_a")
 
+NUMBER_FORMAT = "{0:.8g}"
+
 
 class ScanType(Enum):
     """An enum to represent scan types"""

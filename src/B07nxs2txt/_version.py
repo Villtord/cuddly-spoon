@@ -5,7 +5,7 @@ __all__ = ["__version__", "__version_tuple__", "version", "version_tuple"]
 
 TYPE_CHECKING = False
 
-if TYPE_CHECKING:
+if TYPE_CHECKING is True:  # check for value
     VERSION_TUPLE = tuple[int | str, ...]
 else:
     VERSION_TUPLE = object
