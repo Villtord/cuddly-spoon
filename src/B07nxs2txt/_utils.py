@@ -11,6 +11,9 @@ CLASSIFICATIION_NODE_NEW = "/entry/diamond_scan/scan_fields"
 SCRIPT_OLD = "scripts.b07_convert_old"
 SCRIPT_NEW = "scripts.b07_convert_new"
 
+PGM_NAMES = ("pgm_energy", "pgm_cff")
+XY_SCAN_SCANNABLES_NAMES = ("sm21b_x", "sm21b_y", "sm21b_z", "dummy_a")
+
 
 class ScanType(Enum):
     """An enum to represent scan types"""

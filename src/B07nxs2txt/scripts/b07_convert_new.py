@@ -19,6 +19,8 @@ sys.path.append(os.path.join(os.path.dirname(SCRIPT_DIR), ".."))
 from B07nxs2txt._utils import (  # noqa: E402
     CLASSIFICATIION_NODE_NEW,
     GLOBAL_NODE_NEW,
+    PGM_NAMES,
+    XY_SCAN_SCANNABLES_NAMES,
     ScanType,
     get_classification_node,
     get_instrument_node,
@@ -90,9 +92,8 @@ def classify_scan_type(classification_node: list[str] | None) -> ScanType | None
     instrument_keys = [i.decode("utf-8") for i in classification_node]
 
     # print (f"classification values {instrument_keys}")
-    if any(s.startswith("pgm_energy") for s in instrument_keys) and (
-        any(s.startswith("ca") for s in instrument_keys)
-        or (any(s.startswith("femto") for s in instrument_keys))
+    if any(s.startswith(PGM_NAMES) for s in instrument_keys) and any(
+        s.startswith(("ca", "femto")) for s in instrument_keys
     ):
         # File is some sort of NEXAFS scan
         if any(s.startswith("analyser") for s in instrument_keys):
@@ -101,12 +102,7 @@ def classify_scan_type(classification_node: list[str] | None) -> ScanType | None
             return ScanType.NEXAFS
     elif any(s.startswith("analyser") for s in instrument_keys):
         return ScanType.XPS
-    elif (
-        any(s.startswith("sm21b_x") for s in instrument_keys)
-        or any(s.startswith("sm21b_y") for s in instrument_keys)
-        or any(s.startswith("sm21b_z") for s in instrument_keys)
-        or any(s.startswith("dummy_a") for s in instrument_keys)
-    ):
+    elif any(s.startswith(XY_SCAN_SCANNABLES_NAMES) for s in instrument_keys):
         return ScanType.XY_DATA
     else:
         return None
@@ -126,9 +122,8 @@ def export_nexafs_data(instrument_node: list[str], filename: str, region_name: s
 
     for item in instrument_node:
         # Adds pgm_energy as well as any scannables with ca/femto in their name
-        if (
-            item == "pgm_energy"
-        ):  # Hacky special case - want this to be the first column
+        if item in PGM_NAMES:
+            # Hacky special case - want this to be the first column
             formatted_list = convert_and_format(item, instrument_node)
             if formatted_list != []:
                 title_list.insert(0, item)
