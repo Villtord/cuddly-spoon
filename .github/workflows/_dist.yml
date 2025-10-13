@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Need this to get version number from last tag
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Build sdist and wheel
