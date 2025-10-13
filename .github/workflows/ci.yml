@@ -11,7 +11,7 @@ on:
 jobs:
 
   lint:
-    uses: ./.github/workflows/_tox.yml
+    uses: .github/workflows/_tox.yml
     with:
       tox: pre-commit,type-checking
 
@@ -25,7 +25,7 @@ jobs:
           - runs-on: "ubuntu-latest"
             python-version: "dev"
       fail-fast: false
-    uses: ./.github/workflows/_test.yml
+    uses: .github/workflows/_test.yml
     with:
       runs-on: ${{ matrix.runs-on }}
       python-version: ${{ matrix.python-version }}
@@ -33,22 +33,22 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
-    uses: ./.github/workflows/_docs.yml
+    uses: .github/workflows/_docs.yml
 
 
   dist:
-    uses: ./.github/workflows/_dist.yml
+    uses: .github/workflows/_dist.yml
 
   pypi:
     needs: [dist, test]
     if: github.ref_type == 'tag'
-    uses: ./.github/workflows/_pypi.yml
+    uses: .github/workflows/_pypi.yml
     permissions:
       id-token: write
 
   release:
     needs: [dist, test, docs]
     if: github.ref_type == 'tag'
-    uses: ./.github/workflows/_release.yml
+    uses: .github/workflows/_release.yml
     permissions:
       contents: write
