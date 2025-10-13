@@ -32,10 +32,6 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  docs:
-    uses: ./.github/workflows/_docs.yml
-
-
   dist:
     uses: ./.github/workflows/_dist.yml
 
@@ -47,7 +43,7 @@ jobs:
       id-token: write
 
   release:
-    needs: [dist, test, docs]
+    needs: [dist, test]
     if: github.ref_type == 'tag'
     uses: ./.github/workflows/_release.yml
     permissions:
