@@ -84,38 +84,41 @@ def run_script_with_python(file_path: str, script: str):
         errors.append(f"\n ERROR {file_path} : {e.stderr} \n")
 
 
+def process_file(file_path):
+    global counter_old
+    global counter_new
+    print("\n" + "#" * 50)
+    print(f"Processing file: {file_path}")
+	# Determine the Python version based on the main node
+    main_node_new = is_main_node_new(file_path)
+    if main_node_new is None:
+        print(f"Skipping {file_path} due to missing main node.")
+        return
+    if main_node_new:
+        run_script_with_python(file_path, SCRIPT_NEW)
+        counter_new += 1
+    else:
+        run_script_with_python(file_path, SCRIPT_OLD)
+        counter_old += 1
+
 def process_folder():
     """
     Processes all .nxs files in the folder.
     """
-    global counter_old
-    global counter_new
     nxs_files: list[str]
 
-    if not os.path.isdir(parsed_args.folderpath):
-        print(f"The provided path {parsed_args.folderpath} is not a valid folder.")
+    if not os.path.isdir(parsed_args.path):
+        print(f"The provided path {parsed_args.path} is not a valid folder.")
         return
     # Get all .nxs files
-    nxs_files = [f for f in os.listdir(parsed_args.folderpath) if f.endswith(".nxs")]
+    nxs_files = [f for f in os.listdir(parsed_args.path) if f.endswith(".nxs")]
     if not nxs_files:
-        print(f"No .nxs files found in the folder {parsed_args.folderpath}.")
+        print(f"No .nxs files found in the folder {parsed_args.path}.")
         return
-    for nxs_file in nxs_files:
-        print(os.path.abspath(parsed_args.folderpath))
-        file_path = os.path.join(os.path.abspath(parsed_args.folderpath), nxs_file)
-        print("\n" + "#" * 50)
-        print(f"Processing file: {file_path}")
-        # Determine the Python version based on the main node
-        main_node_new = is_main_node_new(file_path)
-        if main_node_new is None:
-            print(f"Skipping {file_path} due to missing main node.")
-            continue
-        if main_node_new:
-            run_script_with_python(file_path, SCRIPT_NEW)
-            counter_new += 1
-        else:
-            run_script_with_python(file_path, SCRIPT_OLD)
-            counter_old += 1
+    for nxs_file in nxs_files:	
+        print(os.path.abspath(parsed_args.path))
+        file_path = os.path.join(os.path.abspath(parsed_args.path), nxs_file)
+        process_file(file_path)
 
 
 def main(args: Sequence[str] | None = None) -> None:
@@ -129,15 +132,18 @@ def main(args: Sequence[str] | None = None) -> None:
         action="version",
         version=__version__,
     )
-    parser.add_argument("folderpath", help=("Full path to nxs folder to convert files"))
+    parser.add_argument("path", help=("Full path to nxs file or folder to convert files"))
     parser.add_argument(
         "--titles_off", help="Switch OFF column titles", action="store_true"
     )
 
     parsed_args = parser.parse_args()
 
-    # do conversion
-    process_folder()
+	# do conversion
+    if os.path.isfile(parsed_args.path):
+        process_file(parsed_args.path)
+    else:
+        process_folder()
 
     print(f"NUMBER OF PROCESSED NEW FILES: {counter_new} \n")
     print(f"NUMBER OF PROCESSED OLD FILES: {counter_old} \n")
