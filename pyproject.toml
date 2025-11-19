@@ -36,6 +36,7 @@ dev = [
 
 [project.scripts]
 B07-nxs2txt = "B07nxs2txt.__main__:main"
+create_log = "B07nxs2txt.scripts.create_log:"
 
 [project.urls]
 GitHub = "https://github.com/Villtord/cuddly-spoon"
