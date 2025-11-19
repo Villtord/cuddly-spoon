@@ -31,6 +31,7 @@ dev = [
     "types-mock",
     "h5py",
     "argparse",
+    "progress"
 ]
 
 [project.scripts]
