@@ -117,12 +117,8 @@ def save_log(dirpath: Path, col_names: list, outpath: Path):
         print(f"WARNING: {not_implemented_count} files were found to have scan_types not implemented in the log creator")
     print(f"saved sample log to :  {str(outpath)}")
     return 
-        
 
-
-if __name__ == '__main__':
-
-
+def main():
     HELP_STR=(
         "Takes in a directory or directory/subfolder path and creates a scan log exporting to csv"
     )
@@ -157,3 +153,5 @@ if __name__ == '__main__':
     outfile=outpath/f"{exp_num_matches[0]}_sample_log.csv"
     save_log(dirpath,cols,outfile)
 
+if __name__ == '__main__':
+    main()
