@@ -1,15 +1,15 @@
 """
-script to extra data from scans and place into table for a simple record of the scans of interest performed during the experiment. 
+script to extract data from .nxs scans and place into table for 
+a simple record of the scans of interest performed during the experiment. 
 """
 import os
 from pathlib import Path
-import pandas as pd
-import nexusformat.nexus as nx
+import argparse
+import re
 from datetime import datetime
 import numpy as np
-import argparse
 from progress.bar import Bar
-import re
+import nexusformat.nexus as nx
 
 def check_endstation(scan_command):
     """
@@ -55,15 +55,15 @@ def get_pgm_energy_info(filedata,col_names,scan_command,scan_type):
     full_info['scan_command']=scan_command.split(' ')
     precision=0
     energy_vals=np.array(filedata.entry.instrument.pgm_energy.value)
-    full_info['E_start']=round(energy_vals[0],precision)
-    full_info['E_end']=round(energy_vals[-1],precision)
-    full_info['Endstation']=check_endstation(full_info['scan_command'])
-    
-    full_info['datetime']=get_datetime_str(filedata)
-    full_info.update({k:v for k,v in zip(['X','Y','Z','Rot'],get_manipulator_pos(filedata,full_info['Endstation']))})
-    full_info['Slits']=get_slit_pos(filedata)
-    full_info['Scan_type']=scan_type
-    return [str(full_info[col]) if col in full_info.keys() else 'N/A' for col in col_names]
+    full_info['E_start'] = round(energy_vals[0],precision)
+    full_info['E_end'] = round(energy_vals[-1],precision)
+    full_info['Endstation'] = check_endstation(full_info['scan_command'])
+    full_info['datetime'] = get_datetime_str(filedata)
+    full_info.update({k:v for k,v in zip(['X','Y','Z','Rot'],\
+                    get_manipulator_pos(filedata,full_info['Endstation']))})
+    full_info['Slits'] = get_slit_pos(filedata)
+    full_info['Scan_type'] = scan_type
+    return [str(full_info[col]) if col in full_info else 'N/A' for col in col_names]
 
 
 def scan_not_implemented(filedata,col_names,scan_command,scan_type):
@@ -84,7 +84,7 @@ def get_row_data(filedata,col_names):
     scan_type=scan_command.split(' ')[1]
     info_func=scan_not_implemented
     not_implemented=1
-    if scan_type in functions.keys():
+    if scan_type in functions:
         info_func=functions[scan_type]
         not_implemented=0
     row_out=info_func(filedata,col_names,scan_command,scan_type)
@@ -98,9 +98,9 @@ def save_log(dirpath: Path, col_names: list, outpath: Path):
     """
     nxs_list=[file for file in os.listdir(dirpath) if file.endswith('.nxs')]
     nxs_list.sort()
-    bar = Bar('Processing', max=len(nxs_list))
+    progress_bar = Bar('Processing', max=len(nxs_list))
     not_implemented_count=0
-    with open(outpath,"w") as f:
+    with open(outpath,"w",encoding='utf-8') as f:
         col_string='\t'.join(col_names)
         f.write(f"Scan\t{col_string}\n")
         for file in nxs_list:
@@ -108,50 +108,63 @@ def save_log(dirpath: Path, col_names: list, outpath: Path):
             row_data,not_imp_val=get_row_data(filedata,col_names=col_names)
             row_string='\t'.join(row_data)
             f.write(f"{file.split('.nxs')[0]}\t{row_string}\n")
-            bar.next()
+            progress_bar.next()
             not_implemented_count+=not_imp_val
             #fulltable.loc[file.split('.nxs')[0]]=row_data
-    bar.finish()
-    
+    progress_bar.finish()
+
     if not_implemented_count>0:
-        print(f"WARNING: {not_implemented_count} files were found to have scan_types not implemented in the log creator")
+        print(f"WARNING: {not_implemented_count} files were\
+               found to have scan_types not implemented in the log creator")
     print(f"saved sample log to :  {str(outpath)}")
-    return 
+    return
+
+def make_out_file(dir_path,out_path):
+    """
+    parse experiment number from dir_path, and create file name for the specified out_path
+    """
+    exp_num_matches=re.findall(r"[a-zA-Z]{2}\d{5}-\d",dir_path)
+    outfile=out_path/f"{exp_num_matches[0]}_sample_log.csv"
+    return outfile
 
 def main():
-    HELP_STR=(
+    """
+    defines function to take in user input arguments and create sample log
+    """
+    help_str=(
         "Takes in a directory or directory/subfolder path and creates a scan log exporting to csv"
     )
-    parser=argparse.ArgumentParser(description=HELP_STR)
+    parser=argparse.ArgumentParser(description=help_str)
 
-    HELP_STR= (
-        'enter directory or directory/subfolder path for the experiment you want to create the scan log for'
+    help_str= (
+        'enter directory or directory/subfolder path for \
+            the experiment you want to create the scan log for'
     )
-    parser.add_argument('-dir',"--dir_path",help=HELP_STR)
+    parser.add_argument('-dir',"--dir_path",help=help_str)
 
-    HELP_STR= (
+    help_str= (
         'enter the directory path where you want to save the .csv file'
     )
-    parser.add_argument('-out',"--out_path",default=None,help=HELP_STR)
+    parser.add_argument('-out',"--out_path",default=None,help=help_str)
 
-    HELP_STR = (
-        "use this argument to specify which columns you would like in your data. Defaults to ['datetime','E_start', 'E_end', 'Endstation','X','Y','Z','Rot','Slits']"
+    help_str = (
+        "use this argument to specify which columns you would like in your data.\
+              Defaults to ['datetime','E_start', 'E_end', 'Endstation','X','Y','Z','Rot','Slits']"
     )
-    parser.add_argument("-cols","--col_names",default=['Scan_type','datetime','E_start', 'E_end', 'Endstation','X','Y','Z','Rot','Slits'],help=HELP_STR)
+    parser.add_argument("-cols","--col_names",default=['Scan_type','datetime','E_start', \
+                        'E_end', 'Endstation','X','Y','Z','Rot','Slits'],help=help_str)
 
 
     args=parser.parse_args()
-    dir=args.dir_path
     cols=args.col_names
-    dirpath=Path(dir)
+    dirpath=Path(args.dir_path)
     if args.out_path:
         outpath=Path(args.out_path)
     else:
         outpath=dirpath
-    
-    exp_num_matches=re.findall(r"[a-zA-Z]{2}\d{5}-\d",dir)
-    outfile=outpath/f"{exp_num_matches[0]}_sample_log.csv"
-    save_log(dirpath,cols,outfile)
+
+
+    save_log(dirpath,cols,make_out_file(args.dir_path,outpath))
 
 if __name__ == '__main__':
     main()
