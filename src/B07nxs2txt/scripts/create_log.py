@@ -46,6 +46,14 @@ def get_datetime_str(filedata):
     dt_object=datetime.fromisoformat(filedata.entry.start_time.nxdata.decode())
     return dt_object.strftime("%Y-%m-%d %H:%M:%S")
 
+def get_energy_limits(energy_vals,precision):
+    energyshape=np.shape(energy_vals)
+    if (energyshape[-1]==1)| (len(energyshape)==1):
+        return round(energy_vals[0],precision),round(energy_vals[-1],precision)
+    return round(energy_vals[0][0],precision),round(energy_vals[-1][0],precision)
+    
+
+
 
 def get_pgm_energy_info(filedata,col_names,scan_command,scan_type):
     """
@@ -55,8 +63,9 @@ def get_pgm_energy_info(filedata,col_names,scan_command,scan_type):
     full_info['scan_command']=scan_command.split(' ')
     precision=0
     energy_vals=np.array(filedata.entry.instrument.pgm_energy.value)
-    full_info['E_start'] = round(energy_vals[0],precision)
-    full_info['E_end'] = round(energy_vals[-1],precision)
+    e_start,e_stop=get_energy_limits(energy_vals,precision)
+    full_info['E_start'] = e_start
+    full_info['E_end'] = e_stop
     full_info['Endstation'] = check_endstation(full_info['scan_command'])
     full_info['datetime'] = get_datetime_str(filedata)
     full_info.update({k:v for k,v in zip(['X','Y','Z','Rot'],\
