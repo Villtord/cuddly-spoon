@@ -19,42 +19,31 @@ class b07_samplelog_parser():
         self.file=infile
         self.outfile=outfile
         self.filedata=nx.nxload(dirpath/infile)
-        self.scan_command=self.filedata['entry/scan_command']
-        self.function_map={
-            'Date': self.get_date_str,
-            'Time': self.get_time_str,
-            'Endstation': self.get_endstation,
-            'Scan Number': self.get_scan_number,
-            'Scan Type': self.get_scan_type,
-            'Sample Name': self.get_sample_name,
-            'NEXAFS Region': self.get_nexafs_regions,
-            'XPS Region': self.get_xps_regions
-
-        }
+        self.scan_command=self.filedata['entry/scan_command'].nxdata.decode()
         self.standard_columns={
-            'Scan Number': None,
-            'Sample Name': None,	
-            'Scan Type': None,	
-            'NEXAFS Region': None,
-            'XPS Region': None,
-            'Photon Energy': 'entry/instrument/pgm_energy/value',
+            'Scan Number': self.get_scan_number,
+            'Sample Name': self.get_sample_name,	
+            'Scan Type': self.get_scan_type,	
+            'NEXAFS Region': self.get_nexafs_regions,
+            'XPS Region': self.get_xps_regions,
+            'Photon Energy': self.get_photon_energy,
             'cff': 'entry/instrument/pgm_cff/value',
-            'Endstation': None,
-            's4b_Ygapsize': 'entry/instrument/s4b_xpagsize/value',
+            'Endstation': self.get_endstation,
+            's4b_Ygapsize': 'entry/instrument/s4b_ygapsize/value',
             'Scan Command': 'entry/scan_command',
-            'sm21b_x': 'entry/instrument/sm21b_x/value',
-            'sm21b_y': 'entry/instrument/sm21b_y/value',
-            'sm21b_z': 'entry/instrument/sm21b_z/value',
-            'sm21b_Rot': 'entry/instrument/sm21b_Rot/value',
-            'sm52b_xp': 'entry/instrument/sm52b_xp/value',
-            'sm52b_yp': 'entry/instrument/sm52b_yp/value',
-            'sm52b_zp': 'entry/instrument/sm52b_zp/value',
-            'sm52b_RotY': 'entry/instrument/sm52b_RotY/value',
-            'sm52b_RotZ': 'entry/instrument/sm52b_RotZ/value',
+            'sm21b_x':    self.get_sm21b_x, 
+            'sm21b_y':    self.get_sm21b_y,
+            'sm21b_z':    self.get_sm21b_z,
+            'sm21b_Rot':  self.get_sm21b_Rot,
+            'sm52b_xp':   self.get_sm52b_xp,
+            'sm52b_yp':   self.get_sm52b_yp,
+            'sm52b_zp':   self.get_sm52b_zp,
+            'sm52b_RotY': self.get_sm52b_RotY,
+            'sm52b_RotZ': self.get_sm52b_RotZ,
             'm4b YBASE motor position': 'entry/instrument/m4b_y_base_positioner/value',
             'm5b YBASE motor position': 'entry/instrument/m4b_y_base_positioner/value',
-            'Date': None,
-            'Time': None
+            'Date': self.get_date_str,
+            'Time': self.get_time_str
         }
     
     def check_nxroot_key(self,rootobj,path):
@@ -80,7 +69,7 @@ class b07_samplelog_parser():
         column_list=self.standard_columns.keys()
         keys_to_parse=[]
         for key,path in self.standard_columns.items():
-            if path is None:
+            if callable(path):
                 keys_to_parse.append(key)
                 continue
             if not self.check_nxroot_key(self.filedata,path):
@@ -88,18 +77,70 @@ class b07_samplelog_parser():
                 continue
             outdata[key]=f'{self.filedata[path]}'.replace('\n','')
         for key in keys_to_parse:
-            infofunc=self.function_map[key]
+            infofunc=self.standard_columns[key]
             outdata[key]=infofunc()
         out_row=[str(outdata[key]) for key in column_list]
         self.outfile.write('\t'.join(out_row)+'\n')
         return
     
+
+    def get_sm21b_x(self):
+        if self.get_endstation()==2:
+            return self.filedata['entry/instrument/sm21b_x/value']
+        return ''
+
+    def get_sm21b_y(self):    
+        if self.get_endstation()==2:
+            return self.filedata['entry/instrument/sm21b_y/value']
+        return ''
+
+    def get_sm21b_z(self):    
+        if self.get_endstation()==2:
+            return self.filedata['entry/instrument/sm21b_z/value']
+        return ''
+
+    def get_sm21b_Rot(self):
+        if self.get_endstation()==2:
+            return self.filedata['entry/instrument/sm21b_roty/value']
+        return ''
+
+    def get_sm52b_xp(self):   
+        if self.get_endstation()==1:
+            return self.filedata['entry/instrument/sm52b_xp/value']
+        return ''
+
+    def get_sm52b_yp(self):   
+        if self.get_endstation()==1:
+            return self.filedata['entry/instrument/sm52b_yp/value']
+        return ''
+
+    def get_sm52b_zp(self):   
+        if self.get_endstation()==1:
+            return self.filedata['entry/instrument/sm52b_zp/value']
+        return ''
+
+    def get_sm52b_RotY(self): 
+        if self.get_endstation()==1:
+            return self.filedata['entry/instrument/sm52b_roty/value']
+        return ''
+
+    def get_sm52b_RotZ(self): 
+        if self.get_endstation()==1:
+            return self.filedata['entry/instrument/sm52b_rotz/value']
+        return ''
+
     def get_scan_type(self):
         if 'dummy_a 0 0 1' in self.scan_command:
           return 'XPS'
         if 'pgm_energy' in self.scan_command:
           return 'NEXAFS'
         return ''
+
+    def get_photon_energy(self):
+        if self.get_scan_type()=='XPS':
+            return str(self.filedata['entry/instrument/pgm_energy/value']).replace('\n','')
+        return ''
+        
 
     def get_endstation(self):
         """
@@ -127,8 +168,8 @@ class b07_samplelog_parser():
         return f"{self.file.split('.nxs')[0]}"
     
     def get_nexafs_regions(self):
-        if self.get_scan_type()=='NEXAFS':
-            return str(self.filedata['entry/analyser/region_list'].astype(str))
+        # if self.get_scan_type()=='NEXAFS':
+        #     return str(self.filedata['entry/analyser/region_list'].astype(str))
         return ''
     
     def get_sample_name(self):
@@ -137,10 +178,11 @@ class b07_samplelog_parser():
     def get_xps_regions(self):
         if self.get_scan_type()=='XPS':
             return str(self.filedata['entry/analyser/region_list'].astype(str))
+        return ''
 
 
 
-def save_log(dirpath: Path, col_names: list, outfile: Path):
+def save_log(dirpath: Path, outfile: Path):
     """
     create file list of all .nxs files, parse data from each .nxs file and write data to log file
     """
@@ -168,7 +210,8 @@ def make_out_file(dir_path,out_path):
     parse experiment number from dir_path, and create file name for the specified out_path
     """
     exp_num_matches=re.findall(r"[a-zA-Z]{2}\d{5}-\d",dir_path)
-    outfile=out_path/f"{exp_num_matches[0]}_sample_log.tsv"
+    #timestamp_str=datetime.now().strftime("%Y%m%d-%H%M%S")
+    outfile=out_path/f"{exp_num_matches[0]}_log.tsv"
     return outfile
 
 def main():
@@ -191,16 +234,15 @@ def main():
     )
     parser.add_argument('-out',"--out_path",default=None,help=help_str)
 
-    help_str = (
-        "use this argument to specify which columns you would like in your data.\
-              Defaults to ['datetime','E_start', 'E_end', 'Endstation','X','Y','Z','Rot','Slits']"
-    )
-    parser.add_argument("-cols","--col_names",default=['Scan_type','datetime','E_start', \
-                        'E_end', 'Endstation','X','Y','Z','Rot','Slits'],help=help_str)
+    # help_str = (
+    #     "use this argument to specify which columns you would like in your data.\
+    #           Defaults to ['datetime','E_start', 'E_end', 'Endstation','X','Y','Z','Rot','Slits']"
+    # )
+    # parser.add_argument("-cols","--col_names",default=['Scan_type','datetime','E_start', \
+    #                     'E_end', 'Endstation','X','Y','Z','Rot','Slits'],help=help_str)
 
 
     args=parser.parse_args()
-    cols=args.col_names
     dirpath=Path(args.dir_path)
     if args.out_path:
         outpath=Path(args.out_path)
@@ -208,7 +250,7 @@ def main():
         outpath=dirpath
 
 
-    save_log(dirpath,cols,make_out_file(args.dir_path,outpath))
+    save_log(dirpath,make_out_file(args.dir_path,outpath))
 
 if __name__ == '__main__':
     main()
