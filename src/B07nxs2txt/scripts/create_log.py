@@ -10,98 +10,137 @@ from datetime import datetime
 import numpy as np
 from progress.bar import Bar
 import nexusformat.nexus as nx
+from nexusformat.nexus.tree import NeXusError
 
-def check_endstation(scan_command):
-    """
-    check which endstation scan was on, use 'ca35b' as flag for ES1
-    """
-    if 'ca35b' in scan_command:
-        return 1
-    return 2
 
-def get_manipulator_pos(filedata,endstation):
-    """
-    parse manipulator positions from file, using filedata, and endstation value
-    """
-    xyz_keys={1:['sm21b_x','sm21b_y','sm21b_z'],
-              2: ['sm52b_XP','sm52b_YP','sm52b_ZP','RotY']}
-    manipkeys=xyz_keys[endstation]
-    manipvalues=[f"{key}: {filedata.entry.instrument[key].value}" for key in manipkeys]
-    if len(manipvalues)==3:
-        manipvalues.append("N/A")
-    return manipvalues
-
-def get_slit_pos(filedata):
-    """
-    parse slit settings
-    """
-    key='s4b_ygapsize'
-    val=float(filedata.entry.instrument[key].value)
-    return f"{key} : {val}"
-
-def get_datetime_str(filedata):
-    """
-    parse isoformat datetime in readable string
-    """
-    dt_object=datetime.fromisoformat(filedata.entry.start_time.nxdata.decode())
-    return dt_object.strftime("%Y-%m-%d %H:%M:%S")
-
-def get_energy_limits(energy_vals,precision):
-    energyshape=np.shape(energy_vals)
-    if (energyshape[-1]==1)| (len(energyshape)==1):
-        return round(energy_vals[0],precision),round(energy_vals[-1],precision)
-    return round(energy_vals[0][0],precision),round(energy_vals[-1][0],precision)
+class b07_filedata_parser():
     
+    def __init__(self,dirpath,infile,outfile):
+        self.file=infile
+        self.outfile=outfile
+        self.filedata=nx.nxload(dirpath/infile)
+        self.scan_command=self.filedata['entry/scan_command']
+        self.function_map={
+            'Date': self.get_date_str,
+            'Time': self.get_time_str,
+            'Endstation': self.get_endstation,
+            'Scan Number': self.get_scan_number,
+            'Scan Type': self.get_scan_type,
+            'Sample Name': self.get_sample_name,
+            'NEXAFS Region': self.get_nexafs_regions,
+            'XPS Region': self.get_xps_regions
+
+        }
+        self.standard_columns={
+            'Scan Number': None,
+            'Sample Name': None,	
+            'Scan Type': None,	
+            'NEXAFS Region': None,
+            'XPS Region': None,
+            'Photon Energy': 'entry/instrument/pgm_energy/value',
+            'cff': 'entry/instrument/pgm_cff/value',
+            'Endstation': None,
+            's4b_Ygapsize': 'entry/instrument/s4b_xpagsize/value',
+            'Scan Command': 'entry/scan_command',
+            'sm21b_x': 'entry/instrument/sm21b_x/value',
+            'sm21b_y': 'entry/instrument/sm21b_y/value',
+            'sm21b_z': 'entry/instrument/sm21b_z/value',
+            'sm21b_Rot': 'entry/instrument/sm21b_Rot/value',
+            'sm52b_xp': 'entry/instrument/sm52b_xp/value',
+            'sm52b_yp': 'entry/instrument/sm52b_yp/value',
+            'sm52b_zp': 'entry/instrument/sm52b_zp/value',
+            'sm52b_RotY': 'entry/instrument/sm52b_RotY/value',
+            'sm52b_RotZ': 'entry/instrument/sm52b_RotZ/value',
+            'm4b YBASE motor position': 'entry/instrument/m4b_y_base_positioner/value',
+            'm5b YBASE motor position': 'entry/instrument/m4b_y_base_positioner/value',
+            'Date': None,
+            'Time': None
+        }
+    
+    def check_nxroot_key(self,rootobj,path):
+        """
+        check if path exists in file
+        
+        :param rootobj: loaded nexus file data tree- type NXroot
+        :param path: path of value to check
+        """
+        try:
+            _ = rootobj[path]  
+            return True
+        except NeXusError:
+            return False
+        
+    def save_header_data(self):
+        column_list=self.standard_columns.keys()
+        column_str='\t'.join(column_list)
+        self.outfile.write(column_str+'\n')
+
+    def save_row_data(self):
+        outdata={}
+        column_list=self.standard_columns.keys()
+        keys_to_parse=[]
+        for key,path in self.standard_columns.items():
+            if path is None:
+                keys_to_parse.append(key)
+                continue
+            if not self.check_nxroot_key(self.filedata,path):
+                outdata[key]=''
+                continue
+            outdata[key]=f'{self.filedata[path]}'
+        for key in keys_to_parse:
+            infofunc=self.function_map[key]
+            outdata[key]=infofunc()
+        out_row=[str(outdata[key]) for key in column_list]
+        self.outfile.write('\t'.join(out_row)+'\n')
+        return
+    
+    def get_scan_type(self):
+        if 'dummy_a 0 0 1' in self.scan_command:
+          return 'XPS'
+        if 'pgm_energy' in self.scan_command:
+          return 'NEXAFS'
+        return ''
+
+    def get_endstation(self):
+        """
+        check which endstation scan was on, use 'ca35b' as flag for ES1
+        """
+        if 'ca35b' in self.scan_command:
+            return 2
+        return 1
+
+    def get_date_str(self):
+        """
+        parse isoformat datetime in readable date string
+        """
+        dt_object=datetime.fromisoformat(self.filedata.entry.start_time.nxdata.decode())
+        return dt_object.strftime("%Y-%m-%d")
+
+    def get_time_str(self):
+        """
+        parse isoformat datetime in readable time string
+        """
+        dt_object=datetime.fromisoformat(self.filedata.entry.start_time.nxdata.decode())
+        return dt_object.strftime("%H:%M:%S")
+
+    def get_scan_number(self):
+        return f"{self.file.split('.nxs')[0]}"
+    
+    def get_nexafs_regions(self):
+        if self.get_scan_type()=='NEXAFS':
+            return str(self.filedata['entry/analyser/region_list'].astype(str))
+        return ''
+    
+    def get_sample_name(self):
+        return ''
+   
+    def get_xps_regions(self):
+        if self.get_scan_type()=='XPS':
+            return str(self.filedata['entry/analyser/region_list'].astype(str))
 
 
 
-def get_pgm_energy_info(filedata,col_names,scan_command,scan_type):
-    """
-    parse data from a pgm_energy scan
-    """
-    full_info={}
-    full_info['scan_command']=scan_command.split(' ')
-    precision=0
-    energy_vals=np.array(filedata.entry.instrument.pgm_energy.value)
-    e_start,e_stop=get_energy_limits(energy_vals,precision)
-    full_info['E_start'] = e_start
-    full_info['E_end'] = e_stop
-    full_info['Endstation'] = check_endstation(full_info['scan_command'])
-    full_info['datetime'] = get_datetime_str(filedata)
-    full_info.update({k:v for k,v in zip(['X','Y','Z','Rot'],\
-                    get_manipulator_pos(filedata,full_info['Endstation']))})
-    full_info['Slits'] = get_slit_pos(filedata)
-    full_info['Scan_type'] = scan_type
-    return [str(full_info[col]) if col in full_info else 'N/A' for col in col_names]
-
-
-def scan_not_implemented(filedata,col_names,scan_command,scan_type):
-    """
-    return minimal information about scan and show not implemented value
-    """
-    scantypelist=[scan_type,get_datetime_str(filedata)]
-    nalist=['Not implemented']*(len(col_names)-1)
-    return scantypelist  + nalist
-
-
-def get_row_data(filedata,col_names):
-    """
-    obtain data from file to fill requested columns in log
-    """
-    functions={'pgm_energy':get_pgm_energy_info}
-    scan_command=filedata.entry.scan_command.nxdata.decode()
-    scan_type=scan_command.split(' ')[1]
-    info_func=scan_not_implemented
-    not_implemented=1
-    if scan_type in functions:
-        info_func=functions[scan_type]
-        not_implemented=0
-    row_out=info_func(filedata,col_names,scan_command,scan_type)
-    return row_out,not_implemented
-
-
-
-def save_log(dirpath: Path, col_names: list, outpath: Path):
+def save_log(dirpath: Path, col_names: list, outfile: Path):
     """
     create file list of all .nxs files, parse data from each .nxs file and write data to log file
     """
@@ -109,23 +148,19 @@ def save_log(dirpath: Path, col_names: list, outpath: Path):
     nxs_list.sort()
     progress_bar = Bar('Processing', max=len(nxs_list))
     not_implemented_count=0
-    with open(outpath,"w",encoding='utf-8') as f:
-        col_string='\t'.join(col_names)
-        f.write(f"Scan\t{col_string}\n")
-        for file in nxs_list:
-            filedata=nx.nxload(dirpath/file)
-            row_data,not_imp_val=get_row_data(filedata,col_names=col_names)
-            row_string='\t'.join(row_data)
-            f.write(f"{file.split('.nxs')[0]}\t{row_string}\n")
+    with open(outfile,"w",encoding='utf-8') as f:
+        for file_count,file in enumerate(nxs_list):
+            parser=b07_filedata_parser(dirpath,file,f)
+            if file_count==0:
+                parser.save_header_data()
+            parser.save_row_data()
             progress_bar.next()
-            not_implemented_count+=not_imp_val
-            #fulltable.loc[file.split('.nxs')[0]]=row_data
     progress_bar.finish()
 
     if not_implemented_count>0:
         print(f"WARNING: {not_implemented_count} files were\
                found to have scan_types not implemented in the log creator")
-    print(f"saved sample log to :  {str(outpath)}")
+    print(f"saved sample log to :  {str(outfile)}")
     return
 
 def make_out_file(dir_path,out_path):
@@ -133,7 +168,7 @@ def make_out_file(dir_path,out_path):
     parse experiment number from dir_path, and create file name for the specified out_path
     """
     exp_num_matches=re.findall(r"[a-zA-Z]{2}\d{5}-\d",dir_path)
-    outfile=out_path/f"{exp_num_matches[0]}_sample_log.csv"
+    outfile=out_path/f"{exp_num_matches[0]}_sample_log.tsv"
     return outfile
 
 def main():
