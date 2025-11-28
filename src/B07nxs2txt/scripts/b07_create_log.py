@@ -87,59 +87,59 @@ class b07_samplelog_parser():
     def get_sm21b_x(self):
         if self.get_endstation()==2:
             return self.filedata['entry/instrument/sm21b_x/value']
-        return ''
+        return " "
 
     def get_sm21b_y(self):    
         if self.get_endstation()==2:
             return self.filedata['entry/instrument/sm21b_y/value']
-        return ''
+        return " "
 
     def get_sm21b_z(self):    
         if self.get_endstation()==2:
             return self.filedata['entry/instrument/sm21b_z/value']
-        return ''
+        return " "
 
     def get_sm21b_Rot(self):
         if self.get_endstation()==2:
             return self.filedata['entry/instrument/sm21b_roty/value']
-        return ''
+        return " "
 
     def get_sm52b_xp(self):   
         if self.get_endstation()==1:
             return self.filedata['entry/instrument/sm52b_xp/value']
-        return ''
+        return " "
 
     def get_sm52b_yp(self):   
         if self.get_endstation()==1:
             return self.filedata['entry/instrument/sm52b_yp/value']
-        return ''
+        return " "
 
     def get_sm52b_zp(self):   
         if self.get_endstation()==1:
             return self.filedata['entry/instrument/sm52b_zp/value']
-        return ''
+        return " "
 
     def get_sm52b_RotY(self): 
         if self.get_endstation()==1:
             return self.filedata['entry/instrument/sm52b_roty/value']
-        return ''
+        return " "
 
     def get_sm52b_RotZ(self): 
         if self.get_endstation()==1:
             return self.filedata['entry/instrument/sm52b_rotz/value']
-        return ''
+        return " "
 
     def get_scan_type(self):
         if 'dummy_a 0 0 1' in self.scan_command:
           return 'XPS'
         if 'pgm_energy' in self.scan_command:
           return 'NEXAFS'
-        return ''
+        return " "
 
     def get_photon_energy(self):
         if self.get_scan_type()=='XPS':
             return str(self.filedata['entry/instrument/pgm_energy/value']).replace('\n','')
-        return ''
+        return " "
         
 
     def get_endstation(self):
