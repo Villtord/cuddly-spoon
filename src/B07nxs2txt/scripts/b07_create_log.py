@@ -86,7 +86,7 @@ class b07_samplelog_parser():
             if not self.check_nxroot_key(self.filedata,path):
                 outdata[key]=''
                 continue
-            outdata[key]=f'{self.filedata[path]}'
+            outdata[key]=f'{self.filedata[path]}'.replace('\n','')
         for key in keys_to_parse:
             infofunc=self.function_map[key]
             outdata[key]=infofunc()
