@@ -13,7 +13,7 @@ import nexusformat.nexus as nx
 from nexusformat.nexus.tree import NeXusError
 
 
-class b07_filedata_parser():
+class b07_samplelog_parser():
     
     def __init__(self,dirpath,infile,outfile):
         self.file=infile
@@ -150,7 +150,7 @@ def save_log(dirpath: Path, col_names: list, outfile: Path):
     not_implemented_count=0
     with open(outfile,"w",encoding='utf-8') as f:
         for file_count,file in enumerate(nxs_list):
-            parser=b07_filedata_parser(dirpath,file,f)
+            parser=b07_samplelog_parser(dirpath,file,f)
             if file_count==0:
                 parser.save_header_data()
             parser.save_row_data()
