@@ -189,7 +189,6 @@ def save_log(dirpath: Path, outfile: Path):
     nxs_list=[file for file in os.listdir(dirpath) if file.endswith('.nxs')]
     nxs_list.sort()
     progress_bar = Bar('Processing', max=len(nxs_list))
-    not_implemented_count=0
     with open(outfile,"w",encoding='utf-8') as f:
         for file_count,file in enumerate(nxs_list):
             parser=b07_samplelog_parser(dirpath,file,f)
@@ -198,10 +197,6 @@ def save_log(dirpath: Path, outfile: Path):
             parser.save_row_data()
             progress_bar.next()
     progress_bar.finish()
-
-    if not_implemented_count>0:
-        print(f"WARNING: {not_implemented_count} files were\
-               found to have scan_types not implemented in the log creator")
     print(f"saved sample log to :  {str(outfile)}")
     return
 
