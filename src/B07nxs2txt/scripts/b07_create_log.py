@@ -34,12 +34,12 @@ class b07_samplelog_parser():
             'sm21b_x':    self.get_sm21b_x, 
             'sm21b_y':    self.get_sm21b_y,
             'sm21b_z':    self.get_sm21b_z,
-            'sm21b_Rot':  self.get_sm21b_Rot,
+            'sm21b_roty':  self.get_sm21b_roty,
             'sm52b_xp':   self.get_sm52b_xp,
             'sm52b_yp':   self.get_sm52b_yp,
             'sm52b_zp':   self.get_sm52b_zp,
-            'sm52b_RotY': self.get_sm52b_RotY,
-            'sm52b_RotZ': self.get_sm52b_RotZ,
+            'sm52b_rotY': self.get_sm52b_rotY,
+            'sm52b_rotZ': self.get_sm52b_rotZ,
             'm4b YBASE motor position': 'entry/instrument/m4b_y_base_positioner/value',
             'm5b YBASE motor position': 'entry/instrument/m4b_y_base_positioner/value',
             'Date': self.get_date_str,
@@ -99,7 +99,7 @@ class b07_samplelog_parser():
             return self.filedata['entry/instrument/sm21b_z/value']
         return " "
 
-    def get_sm21b_Rot(self):
+    def get_sm21b_roty(self):
         if self.get_endstation()==2:
             return self.filedata['entry/instrument/sm21b_roty/value']
         return " "
@@ -119,12 +119,12 @@ class b07_samplelog_parser():
             return self.filedata['entry/instrument/sm52b_zp/value']
         return " "
 
-    def get_sm52b_RotY(self): 
+    def get_sm52b_rotY(self): 
         if self.get_endstation()==1:
             return self.filedata['entry/instrument/sm52b_roty/value']
         return " "
 
-    def get_sm52b_RotZ(self): 
+    def get_sm52b_rotZ(self): 
         if self.get_endstation()==1:
             return self.filedata['entry/instrument/sm52b_rotz/value']
         return " "
