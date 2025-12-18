@@ -56,7 +56,7 @@ def output_data(instrument_node: File, classification_node: list[str] | None):
         print(f"\n{filename} determined to be a NEXAFS scan with analyser output.")
         region_list = instrument_node["analyser/region_list"]
         if region_list.len() == 1:
-            region_name = region_list[0].decode("utf-8")
+            region_name = region_list[0][0].decode("utf-8")
             print(f"Region name: {region_name}")
             export_nexafs_data(instrument_node, filename, region_name)
             instrument_node.file.close()
