@@ -7,6 +7,7 @@ import argparse
 import csv
 import os
 import sys
+import numpy as np
 from argparse import Namespace
 from typing import Any
 
@@ -107,6 +108,24 @@ def classify_scan_type(classification_node: list[str] | None) -> ScanType | None
     else:
         return None
 
+def check_empty_cols(data_list,title_list):
+    #do check on data for empty columns
+
+    data_array=np.array(data_list,dtype=object)
+    title_array=np.array(title_list,dtype=object)
+    lengths=[len(col) for col in data_list]
+    keep_list=[int(float(length)!=0.0) for length in lengths]
+    empty_arr=np.array([int(float(length)==0.0) for length in lengths],dtype=bool)
+    if np.any([val==0 for val in keep_list]):
+        print(f"columns  {title_array[empty_arr]} found to be empty and removed from output data")
+        filter_arr=np.array(keep_list,dtype=bool)
+        filtered_data=data_array[filter_arr]
+        filtered_title=title_array[filter_arr]
+        return filtered_data,filtered_title
+    return data_array,title_array
+
+
+
 
 def export_nexafs_data(instrument_node: list[str], filename: str, region_name: str):
     """Format pgm_energy vs current and trigger writing to
@@ -137,10 +156,12 @@ def export_nexafs_data(instrument_node: list[str], filename: str, region_name: s
     if data_list:
         print("Data types found: {}".format(" ".join(title_list)))
         # Combine the datasets into a list of tuples
-        zipped = zip(*data_list, strict=False)
+        data_arr,title_arr=check_empty_cols(data_list,title_list)
+
+        zipped = zip(*data_arr, strict=False)
         filename = filename.split(".")[0] + "_NEXAFS.dat"
         filename = filename.replace(" ", "_")
-        write_data_out(filename, title_list, zipped)
+        write_data_out(filename, title_arr, zipped)
         print(f"Data written to file {filename}")
 
 
