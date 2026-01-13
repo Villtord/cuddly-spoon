@@ -141,13 +141,15 @@ def export_nexafs_data(instrument_node: list[str], filename: str, region_name: s
 
     for item in instrument_node:
         # Adds pgm_energy as well as any scannables with ca/femto in their name
+        checklist=["ca","femto","ring_current"]
         if item in PGM_NAMES:
             # Hacky special case - want this to be the first column
             formatted_list = convert_and_format(item, instrument_node)
             if formatted_list != []:
                 title_list.insert(0, item)
                 data_list.insert(0, formatted_list)
-        elif ("ca" in item) or ("femto" in item):
+        
+        elif any([checkval in item for checkval in checklist]):
             formatted_list = convert_and_format(item, instrument_node)
             if formatted_list != []:
                 title_list.append(item)
