@@ -113,7 +113,7 @@ def check_empty_cols(data_list,title_list):
 
     data_array=np.array(data_list,dtype=object)
     title_array=np.array(title_list,dtype=object)
-    lengths=[len(col) for col in data_list]
+    lengths=[len(col) for col in data_array]
     keep_list=[int(float(length)!=0.0) for length in lengths]
     empty_arr=np.array([int(float(length)==0.0) for length in lengths],dtype=bool)
     if np.any([val==0 for val in keep_list]):
@@ -234,21 +234,28 @@ def export_xps_data(region, filename: str):
 
 
 def convert_and_format(item, instrument_node):
-    if "value" in instrument_node[item].keys():
+    
+    node_keys=instrument_node[item].keys()
+    if "value" in node_keys :
         path_string = f"{item}/value"
-    elif item in instrument_node[item].keys():
+    elif item in node_keys:
         path_string = f"{item}/{item}"
+    elif "total_intensity" in node_keys:
+        path_string = f"{item}/total_intensity"
     else:
         return []
 
     # print ("Path stirng {}".format(path_string))
     # print (list(instrument_node[item]))
-
-    if instrument_node[path_string].ndim == 0:
+    path_ndims=instrument_node[path_string].ndim
+    if  path_ndims == 0:
         return []
-    elif instrument_node[path_string].ndim == 1:
-        object = instrument_node[path_string]
-        return [NUMBER_FORMAT.format(object[i]) for i in range(object.len())]
+    elif path_ndims == 1:
+        dataobject = instrument_node[path_string]
+        return [NUMBER_FORMAT.format(dataobject[i]) for i in range(dataobject.len())]
+    elif path_ndims == 2:
+        dataobject = instrument_node[path_string][:,0]
+        return [NUMBER_FORMAT.format(dataobject[i]) for i in range(len(dataobject))]
 
 
 def write_data_out(filename: str, title_list: list[str], zipped: dict[str, Any]):
