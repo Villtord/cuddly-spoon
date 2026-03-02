@@ -14,9 +14,11 @@ The inputs needed for the command are as follows:
 
 
    * -dir -  the path to the experiment directory
-   * (optional) -out   -the path to the output folder, which will default to the experiment directory if no output path is given 
+   * (optional) -out   -the path to the output folder, which will default to the experiment directory if no output path is given
+   * (optional) -sl   - a list of scan numbers to be included in the sample log
+   * (optional) -sr   - a range of scan number to be included in the sample log in the format [start,stop,step]
 
-two examples of valid commands are:
+ examples of valid commands are:
 
 .. code-block:: python
     
@@ -25,6 +27,12 @@ two examples of valid commands are:
     
     #to save output to home documents include the output path value
     create_log -dir /dls/b07/data/2025/si43348-1 -out /home/rpy65944/Documents
+
+    #to only select scans 123 and 456
+    create_log -dir /dls/b07/data/2025/si43348-1 -sl 123 456
+
+    #to select scans 120 to 130
+    create_log -dir /dls/b07/data/2025/si43348-1 -sr [120,130,1]
 
 
 this start processing showing a progress bar, and then give an output like this
