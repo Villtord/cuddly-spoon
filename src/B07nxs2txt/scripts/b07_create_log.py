@@ -224,12 +224,13 @@ def make_scan_list(scan_list_in, scan_range):
     return scan_list_in
 
 
-def save_log(dirpath: Path, outfile: Path, scan_list_in: list, scan_range: str):
+def save_log(dirpath: Path, outpath: Path, scan_list_in: list, scan_range: str):
     """
     create file list of all .nxs files, parse data from each .nxs file and write data to log file
     """
 
     scan_list = make_scan_list(scan_list_in, scan_range)
+    outfile = make_out_file(dirpath, outpath, scan_list[0])
     nxs_list_all = [file for file in os.listdir(dirpath) if file.endswith(".nxs")]
     if len(scan_list) == 0:
         nxs_list = nxs_list_all
@@ -251,13 +252,13 @@ def save_log(dirpath: Path, outfile: Path, scan_list_in: list, scan_range: str):
     return
 
 
-def make_out_file(dir_path, out_path):
+def make_out_file(dir_path: Path, out_path: Path, first_scan: int):
     """
     parse experiment number from dir_path, and create file name for the specified out_path
     """
-    exp_num_matches = re.findall(r"[a-zA-Z]{2}\d{5}-\d", dir_path)
+    exp_num_matches = re.findall(r"[a-zA-Z]{2}\d{5}-\d", str(dir_path))
     # timestamp_str=datetime.now().strftime("%Y%m%d-%H%M%S")
-    outfile = out_path / f"{exp_num_matches[0]}_log.tsv"
+    outfile = out_path / f"{exp_num_matches[0]}_{str(first_scan)}_log.tsv"
     return outfile
 
 
@@ -295,9 +296,7 @@ def main():
     else:
         outpath = dirpath
 
-    save_log(
-        dirpath, make_out_file(args.dir_path, outpath), args.scan_list, args.scan_range
-    )
+    save_log(dirpath, outpath, args.scan_list, args.scan_range)
 
 
 if __name__ == "__main__":
