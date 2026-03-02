@@ -277,7 +277,7 @@ def main():
     parser.add_argument("-out", "--out_path", default=None, help=help_str)
 
     help_str = "Separate scan numbers to be mapped into the log without brackets e.g 441124 441128"
-    parser.add_argument("-sl", "--scan_list", nargs="+", type=int, help=help_str)
+    parser.add_argument("-sl", "--scan_list", nargs="+", type=int, help=help_str,default=[])
 
     help_str = "Evenly spaced range of scans to be added to the log in the format [start,stop,step]"
     parser.add_argument("-sr", "--scan_range", help=help_str, default=[])
