@@ -45,6 +45,9 @@ GitHub = "https://github.com/Villtord/cuddly-spoon"
 email = "villtord@proton.me"
 name = "Victor Rogalev"
 
+[[project.authors]] # Further authors may be added by duplicating this section
+email = "philip.mousley@diamond.ac.uk"
+name = "Philip Mousley"
 
 [tool.setuptools_scm]
 version_file = "src/B07nxs2txt/_version.py"
