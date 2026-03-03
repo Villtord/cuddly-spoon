@@ -104,6 +104,18 @@ def process_file(file_path):
         run_script_with_python(file_path, SCRIPT_OLD, outpath)
         counter_old += 1
 
+def parse_scan_range(scan_range):
+    s = scan_range.strip("[]")
+    start, stop, step = map(int, s.split(","))
+    return list(range(start, stop + 1, step))
+
+
+def make_scan_list(scan_list_in, scan_range):
+    if len(scan_range) > 0:
+        add_scans = parse_scan_range(scan_range)
+        scan_list_in.extend(add_scans)
+    return scan_list_in
+
 def process_folder():
     """
     Processes all .nxs files in the folder.
@@ -114,8 +126,15 @@ def process_folder():
         print(f"The provided path {parsed_args.path} is not a valid folder.")
         return
     # Get all .nxs files
+    scan_list = make_scan_list(parsed_args.scan_list, parsed_args.scan_range)
+    nxs_list_all = [file for file in os.listdir(parsed_args.path) if file.endswith(".nxs")]
+    if len(scan_list) == 0:
+        nxs_files = nxs_list_all
+    else:
+        nxs_files = [
+            file for file in nxs_list_all if any(str(num) in file for num in scan_list)
+        ]
 
-    nxs_files = [f for f in os.listdir(parsed_args.path) if f.endswith(".nxs")]
     if not nxs_files:
         print(f"No .nxs files found in the folder {parsed_args.path}.")
         return
@@ -144,13 +163,19 @@ def main(args: Sequence[str] | None = None) -> None:
     help_str = "enter the directory path where you want to save the converted data"
     parser.add_argument("-out", "--out_path", default=None, help=help_str)
 
+    help_str = "Separate scan numbers to be mapped into the log without brackets e.g 441124 441128"
+    parser.add_argument("-sl", "--scan_list", nargs="+", type=int, help=help_str,default=[])
+
+    help_str = "Evenly spaced range of scans to be added to the log in the format [start,stop,step]"
+    parser.add_argument("-sr", "--scan_range", help=help_str, default=[])
+
     parsed_args = parser.parse_args()
 
     if parsed_args.out_path is None:
         parsed_args.out_path =  parsed_args.path
 	# do conversion
     if os.path.isfile(parsed_args.path):
-        process_file()
+        process_file(parsed_args.path)
     else:
         process_folder()
 

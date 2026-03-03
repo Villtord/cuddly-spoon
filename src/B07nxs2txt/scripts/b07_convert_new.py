@@ -232,7 +232,7 @@ def export_xps_data(region, filename: str):
     filename = filename.split(".")[0] + "_" + region_name + "_XPS.dat"
     filename = filename.replace(" ", "_")
     write_data_out(filename, title_list, zipped)
-    print(f"Data for region {region_name} written to file {filename}")
+    print(f"Data for region {region_name} written to file {parsed_args.out_path}/{filename}")
 
 
 def convert_and_format(item, instrument_node):

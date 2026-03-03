@@ -204,7 +204,7 @@ def export_xps_data(region, filename):
     filename = filename.split(".")[0] + "_" + region_name + "_XPS.dat"
     filename = filename.replace(" ", "_")
     write_data_out(filename, title_list, zipped)
-    print(f"Data for region {region_name} written to file {filename}")
+    print(f"Data for region {region_name} written to file {parsed_args.out_path}/{filename}")
 
 
 def write_data_out(filename: str, title_list: list[str], zipped: dict[str, Any]):
