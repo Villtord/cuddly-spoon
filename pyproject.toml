@@ -12,7 +12,10 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 description = "convertion script from nexus to txt for DLS B07 beamlines"
-dependencies = ["h5py", "argparse",] # Add project dependencies here, e.g. ["click", "numpy"]
+dependencies = ["h5py", 
+"argparse",
+"progress",
+] # Add project dependencies here, e.g. ["click", "numpy"]
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.md"
@@ -29,9 +32,6 @@ dev = [
     "ruff",
     "tox-direct",
     "types-mock",
-    "h5py",
-    "argparse",
-    "progress"
 ]
 
 [project.scripts]
