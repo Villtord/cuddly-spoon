@@ -230,7 +230,7 @@ def save_log(dirpath: Path, outpath: Path, scan_list_in: list, scan_range: str):
     """
 
     scan_list = make_scan_list(scan_list_in, scan_range)
-    outfile = make_out_file(dirpath, outpath, scan_list[0])
+    
     nxs_list_all = [file for file in os.listdir(dirpath) if file.endswith(".nxs")]
     if len(scan_list) == 0:
         nxs_list = nxs_list_all
@@ -239,6 +239,8 @@ def save_log(dirpath: Path, outpath: Path, scan_list_in: list, scan_range: str):
             file for file in nxs_list_all if any(str(num) in file for num in scan_list)
         ]
     nxs_list.sort()
+    firstscan = int(nxs_list[0].split('-')[-1].replace('.nxs',''))
+    outfile = make_out_file(dirpath, outpath,firstscan )
     progress_bar = Bar("Processing", max=len(nxs_list))
     with open(outfile, "w", encoding="utf-8") as f:
         for file_count, file in enumerate(nxs_list):
