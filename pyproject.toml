@@ -15,6 +15,7 @@ description = "convertion script from nexus to txt for DLS B07 beamlines"
 dependencies = ["h5py", 
 "argparse",
 "progress",
+"nexusformat",
 ] # Add project dependencies here, e.g. ["click", "numpy"]
 dynamic = ["version"]
 license.file = "LICENSE"
