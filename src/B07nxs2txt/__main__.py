@@ -173,6 +173,9 @@ def main(args: Sequence[str] | None = None) -> None:
 
     if parsed_args.out_path is None:
         parsed_args.out_path =  parsed_args.path
+    
+    if not os.path.exists(parsed_args.out_path):
+        os.mkdir(parsed_args.out_path)
 	# do conversion
     if os.path.isfile(parsed_args.path):
         process_file(parsed_args.path)
