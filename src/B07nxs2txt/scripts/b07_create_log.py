@@ -28,6 +28,8 @@ class b07_samplelog_parser:
         self.scan_command = self.filedata[
             f"{self.entry_path}/scan_command"
         ].nxdata.decode()
+        m4b_ybasevalue = "instrument/m4b_y_base_positioner/value"
+        m5b_ybasevalue = "instrument/m5b_y_base_positioner/value"
         self.standard_columns = {
             "Scan Number": self.get_scan_number,
             "Sample Name": self.get_sample_name,
@@ -48,8 +50,8 @@ class b07_samplelog_parser:
             "sm52b_zp": self.get_sm52b_zp,
             "sm52b_rotY": self.get_sm52b_rotY,
             "sm52b_rotZ": self.get_sm52b_rotZ,
-            "m4b YBASE motor position": f"{self.entry_path}/instrument/m4b_y_base_positioner/value",
-            "m5b YBASE motor position": f"{self.entry_path}/instrument/m4b_y_base_positioner/value",
+            "m4b YBASE motor position": f"{self.entry_path}/{m4b_ybasevalue}",
+            "m5b YBASE motor position": f"{self.entry_path}/{m5b_ybasevalue}",
             "Date": self.get_date_str,
             "Time": self.get_time_str,
         }
@@ -226,7 +228,8 @@ def make_scan_list(scan_list_in, scan_range):
 
 def save_log(dirpath: Path, outpath: Path, scan_list_in: list, scan_range: str):
     """
-    create file list of all .nxs files, parse data from each .nxs file and write data to log file
+    create file list of all .nxs files, parse data from each .nxs file and write data to
+      log file
     """
 
     scan_list = make_scan_list(scan_list_in, scan_range)
@@ -256,7 +259,8 @@ def save_log(dirpath: Path, outpath: Path, scan_list_in: list, scan_range: str):
 
 def make_out_file(dir_path: Path, out_path: Path, first_scan: int):
     """
-    parse experiment number from dir_path, and create file name for the specified out_path
+    parse experiment number from dir_path, and create file name for the\
+          specified out_path
     """
     exp_num_matches = re.findall(r"[a-zA-Z]{2}\d{5}-\d", str(dir_path))
     # timestamp_str=datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -268,7 +272,10 @@ def main():
     """
     defines function to take in user input arguments and create sample log
     """
-    help_str = "Takes in a directory or directory/subfolder path and creates a scan log exporting to csv"
+    help_str = (
+        "Takes in a directory or directory/subfolder path and creates a scan log \
+        exporting to csv"
+    )
     parser = argparse.ArgumentParser(description=help_str)
 
     help_str = "enter directory or directory/subfolder path for \
@@ -278,20 +285,24 @@ def main():
     help_str = "enter the directory path where you want to save the .csv file"
     parser.add_argument("-out", "--out_path", default=None, help=help_str)
 
-    help_str = "Separate scan numbers to be mapped into the log without brackets e.g 441124 441128"
+    help_str = "Separate scan numbers to be mapped into the log without brackets \
+        e.g 441124 441128"
     parser.add_argument(
         "-sl", "--scan_list", nargs="+", type=int, help=help_str, default=[]
     )
 
-    help_str = "Evenly spaced range of scans to be added to the log in the format [start,stop,step]"
+    help_str = "Evenly spaced range of scans to be added to the log in the format\
+          [start,stop,step]"
     parser.add_argument("-sr", "--scan_range", help=help_str, default=[])
 
     # help_str = (
     #     "use this argument to specify which columns you would like in your data.\
-    #           Defaults to ['datetime','E_start', 'E_end', 'Endstation','X','Y','Z','Rot','Slits']"
+    #           Defaults to ['datetime','E_start', 'E_end', 'Endstation','X','Y','Z',\
+    # 'Rot','Slits']"
     # )
-    # parser.add_argument("-cols","--col_names",default=['Scan_type','datetime','E_start', \
-    #                     'E_end', 'Endstation','X','Y','Z','Rot','Slits'],help=help_str)
+    # parser.add_argument("-cols","--col_names",\
+    # default=['Scan_type','datetime','E_start', \
+    #       'E_end', 'Endstation','X','Y','Z','Rot','Slits'],help=help_str)
 
     args = parser.parse_args()
     dirpath = Path(args.dir_path)

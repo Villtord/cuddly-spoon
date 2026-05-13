@@ -58,9 +58,11 @@ def run_script_with_python(file_path: str, script: str, outpath: str):
     result = None
     try:
         if parsed_args.titles_off:
-            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path} -out {outpath} --titles_off"
+            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path} \
+                -out {outpath} --titles_off"
         else:
-            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path} -out {outpath}"
+            command = f"cd {SCRIPT_DIR}; python -m {script} {file_path}\
+                  -out {outpath}"
         result = subprocess.run(
             command, shell=True, check=True, capture_output=True, text=True
         )
@@ -168,12 +170,14 @@ def main(args: Sequence[str] | None = None) -> None:
     help_str = "enter the directory path where you want to save the converted data"
     parser.add_argument("-out", "--out_path", default=None, help=help_str)
 
-    help_str = "Separate scan numbers to be mapped into the log without brackets e.g 441124 441128"
+    help_str = "Separate scan numbers to be mapped into the log without brackets\
+          e.g 441124 441128"
     parser.add_argument(
         "-sl", "--scan_list", nargs="+", type=int, help=help_str, default=[]
     )
 
-    help_str = "Evenly spaced range of scans to be added to the log in the format [start,stop,step]"
+    help_str = "Evenly spaced range of scans to be added to the log in the format \
+        [start,stop,step] "
     parser.add_argument("-sr", "--scan_range", help=help_str, default=[])
 
     parsed_args = parser.parse_args()

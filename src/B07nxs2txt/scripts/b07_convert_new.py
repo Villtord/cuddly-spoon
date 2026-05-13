@@ -7,11 +7,11 @@ import argparse
 import csv
 import os
 import sys
-import numpy as np
 from argparse import Namespace
 from typing import Any
 
 import h5py
+import numpy as np
 from h5py._hl.files import File
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -119,7 +119,8 @@ def check_empty_cols(data_list, title_list):
     empty_arr = np.array([int(float(length) == 0.0) for length in lengths], dtype=bool)
     if np.any([val == 0 for val in keep_list]):
         print(
-            f"columns  {title_array[empty_arr]} found to be empty and removed from output data"
+            f"columns  {title_array[empty_arr]} found to be empty and \
+                removed from output data"
         )
         filter_arr = np.array(keep_list, dtype=bool)
         filtered_data = data_array[filter_arr]
@@ -150,7 +151,7 @@ def export_nexafs_data(instrument_node: list[str], filename: str, region_name: s
                 title_list.insert(0, item)
                 data_list.insert(0, formatted_list)
 
-        elif any([checkval in item for checkval in checklist]):
+        elif any(checkval in item for checkval in checklist):
             formatted_list = convert_and_format(item, instrument_node)
             if formatted_list != []:
                 title_list.append(item)
