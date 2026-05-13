@@ -11,6 +11,7 @@ from argparse import Namespace
 from typing import Any
 
 import h5py
+import numpy as np
 from h5py._hl.files import File
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -108,6 +109,26 @@ def classify_scan_type(classification_node: list[str] | None) -> ScanType | None
         return None
 
 
+def check_empty_cols(data_list, title_list):
+    # do check on data for empty columns
+
+    data_array = np.array(data_list, dtype=object)
+    title_array = np.array(title_list, dtype=object)
+    lengths = [len(col) for col in data_array]
+    keep_list = [int(float(length) != 0.0) for length in lengths]
+    empty_arr = np.array([int(float(length) == 0.0) for length in lengths], dtype=bool)
+    if np.any([val == 0 for val in keep_list]):
+        print(
+            f"columns  {title_array[empty_arr]} found to be empty and \
+                removed from output data"
+        )
+        filter_arr = np.array(keep_list, dtype=bool)
+        filtered_data = data_array[filter_arr]
+        filtered_title = title_array[filter_arr]
+        return filtered_data, filtered_title
+    return data_array, title_array
+
+
 def export_nexafs_data(instrument_node: list[str], filename: str, region_name: str):
     """Format pgm_energy vs current and trigger writing to
     a file
@@ -122,13 +143,15 @@ def export_nexafs_data(instrument_node: list[str], filename: str, region_name: s
 
     for item in instrument_node:
         # Adds pgm_energy as well as any scannables with ca/femto in their name
+        checklist = ["ca", "femto", "ring_current"]
         if item in PGM_NAMES:
             # Hacky special case - want this to be the first column
             formatted_list = convert_and_format(item, instrument_node)
             if formatted_list != []:
                 title_list.insert(0, item)
                 data_list.insert(0, formatted_list)
-        elif ("ca" in item) or ("femto" in item):
+
+        elif any(checkval in item for checkval in checklist):
             formatted_list = convert_and_format(item, instrument_node)
             if formatted_list != []:
                 title_list.append(item)
@@ -137,10 +160,12 @@ def export_nexafs_data(instrument_node: list[str], filename: str, region_name: s
     if data_list:
         print("Data types found: {}".format(" ".join(title_list)))
         # Combine the datasets into a list of tuples
-        zipped = zip(*data_list, strict=False)
+        data_arr, title_arr = check_empty_cols(data_list, title_list)
+
+        zipped = zip(*data_arr, strict=False)
         filename = filename.split(".")[0] + "_NEXAFS.dat"
         filename = filename.replace(" ", "_")
-        write_data_out(filename, title_list, zipped)
+        write_data_out(filename, title_arr, zipped)
         print(f"Data written to file {filename}")
 
 
@@ -209,25 +234,35 @@ def export_xps_data(region, filename: str):
     filename = filename.split(".")[0] + "_" + region_name + "_XPS.dat"
     filename = filename.replace(" ", "_")
     write_data_out(filename, title_list, zipped)
-    print(f"Data for region {region_name} written to file {filename}")
+    print(
+        f"Data for region {region_name} written to file \
+            {parsed_args.out_path}/{filename}"
+    )
 
 
 def convert_and_format(item, instrument_node):
-    if "value" in instrument_node[item].keys():
+
+    node_keys = instrument_node[item].keys()
+    if "value" in node_keys:
         path_string = f"{item}/value"
-    elif item in instrument_node[item].keys():
+    elif item in node_keys:
         path_string = f"{item}/{item}"
+    elif "total_intensity" in node_keys:
+        path_string = f"{item}/total_intensity"
     else:
         return []
 
     # print ("Path stirng {}".format(path_string))
     # print (list(instrument_node[item]))
-
-    if instrument_node[path_string].ndim == 0:
+    path_ndims = instrument_node[path_string].ndim
+    if path_ndims == 0:
         return []
-    elif instrument_node[path_string].ndim == 1:
-        object = instrument_node[path_string]
-        return [NUMBER_FORMAT.format(object[i]) for i in range(object.len())]
+    elif path_ndims == 1:
+        dataobject = instrument_node[path_string]
+        return [NUMBER_FORMAT.format(dataobject[i]) for i in range(dataobject.len())]
+    elif path_ndims == 2:
+        dataobject = instrument_node[path_string][:, 0]
+        return [NUMBER_FORMAT.format(dataobject[i]) for i in range(len(dataobject))]
 
 
 def write_data_out(filename: str, title_list: list[str], zipped: dict[str, Any]):
@@ -235,7 +270,7 @@ def write_data_out(filename: str, title_list: list[str], zipped: dict[str, Any])
     global filedir
     global parsed_args
 
-    output_path = os.path.join(filedir, filename)
+    output_path = os.path.join(parsed_args.out_path, filename)
     with open(output_path, "w") as output_file:
         writer = csv.writer(output_file, delimiter="\t")
         if not parsed_args.titles_off:
@@ -260,6 +295,10 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("filepath", help=("Full path to nxs file to convert"))
+
+    help_str = "enter the directory path where you want to save the converted data"
+    parser.add_argument("-out", "--out_path", default=None, help=help_str)
+
     parser.add_argument(
         "--titles_off", help="Switch OFF column titles", action="store_true"
     )

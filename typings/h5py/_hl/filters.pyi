@@ -38,45 +38,51 @@ _COMP_FILTERS = ...
 _FILL_TIME_ENUM = ...
 DEFAULT_GZIP = ...
 DEFAULT_SZIP = ...
+
 class FilterRefBase(Mapping):
     """Base class for referring to an HDF5 and describing its options
 
     Your subclass must define filter_id, and may define a filter_options tuple.
     """
+
     filter_id = ...
     filter_options = ...
-    def __hash__(self) -> int:
+    def __hash__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __len__(self):  # -> int:
         ...
-    
-    def __eq__(self, other) -> bool:
+    def __iter__(self):  # -> Iterator[str]:
         ...
-    
-    def __len__(self): # -> int:
+    def __getitem__(self, item):  # -> tuple[()] | None:
         ...
-    
-    def __iter__(self): # -> Iterator[str]:
-        ...
-    
-    def __getitem__(self, item): # -> tuple[()] | None:
-        ...
-    
-
 
 class Gzip(FilterRefBase):
     filter_id = ...
-    def __init__(self, level=...) -> None:
-        ...
-    
+    def __init__(self, level=...) -> None: ...
 
-
-def fill_dcpl(plist, shape, dtype, chunks, compression, compression_opts, shuffle, fletcher32, maxshape, scaleoffset, external, allow_unknown_filter=..., *, fill_time=...):
-    """ Generate a dataset creation property list.
+def fill_dcpl(
+    plist,
+    shape,
+    dtype,
+    chunks,
+    compression,
+    compression_opts,
+    shuffle,
+    fletcher32,
+    maxshape,
+    scaleoffset,
+    external,
+    allow_unknown_filter=...,
+    *,
+    fill_time=...,
+):
+    """Generate a dataset creation property list.
 
     Undocumented and subject to change without warning.
     """
     ...
 
-def get_filter_name(code): # -> str:
+def get_filter_name(code):  # -> str:
     """
     Return the name of the compression filter for a given filter identifier.
 
@@ -84,8 +90,8 @@ def get_filter_name(code): # -> str:
     """
     ...
 
-def get_filters(plist): # -> dict[Any, Any]:
-    """ Extract a dictionary of active filters from a DCPL, along with
+def get_filters(plist):  # -> dict[Any, Any]:
+    """Extract a dictionary of active filters from a DCPL, along with
     their settings.
 
     Undocumented and subject to change without warning.
@@ -95,8 +101,9 @@ def get_filters(plist): # -> dict[Any, Any]:
 CHUNK_BASE = ...
 CHUNK_MIN = ...
 CHUNK_MAX = ...
-def guess_chunk(shape, maxshape, typesize): # -> tuple[int, ...]:
-    """ Guess an appropriate chunk layout for a dataset, given its shape and
+
+def guess_chunk(shape, maxshape, typesize):  # -> tuple[int, ...]:
+    """Guess an appropriate chunk layout for a dataset, given its shape and
     the size of each element in bytes.  Will allocate chunks only as large
     as MAX_SIZE.  Chunks are generally close to some power-of-2 fraction of
     each axis, slightly favoring bigger values for the last index.

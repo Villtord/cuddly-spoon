@@ -7,13 +7,14 @@ from collections import namedtuple
 """
     High-level interface for creating HDF5 virtual datasets
 """
-class VDSmap(namedtuple('VDSmap', ('vspace', 'file_name', 'dset_name', 'src_space'))):
-    '''Defines a region in a virtual dataset mapping to part of a source dataset
-    '''
+
+class VDSmap(namedtuple("VDSmap", ("vspace", "file_name", "dset_name", "src_space"))):
+    """Defines a region in a virtual dataset mapping to part of a source dataset"""
+
     ...
 
-
 vds_support = ...
+
 class VirtualSource:
     """Source definition for virtual data sets.
 
@@ -34,17 +35,14 @@ class VirtualSource:
         The source dataset is resizable up to this shape. Use None for
         axes you want to be unlimited.
     """
-    def __init__(self, path_or_dataset, name=..., shape=..., dtype=..., maxshape=...) -> None:
-        ...
-    
+    def __init__(
+        self, path_or_dataset, name=..., shape=..., dtype=..., maxshape=...
+    ) -> None: ...
     @property
-    def shape(self): # -> tuple[Any, ...]:
+    def shape(self):  # -> tuple[Any, ...]:
         ...
-    
-    def __getitem__(self, key): # -> Self:
+    def __getitem__(self, key):  # -> Self:
         ...
-    
-
 
 class VirtualLayout:
     """Object for building a virtual dataset.
@@ -68,13 +66,9 @@ class VirtualLayout:
         data in the same file will be stored with filename '.', allowing the
         file to be renamed later.
     """
-    def __init__(self, shape, dtype, maxshape=..., filename=...) -> None:
+    def __init__(self, shape, dtype, maxshape=..., filename=...) -> None: ...
+    def __setitem__(self, key, source):  # -> None:
         ...
-    
-    def __setitem__(self, key, source): # -> None:
-        ...
-    
     def make_dataset(self, parent, name, fillvalue=...):
-        """ Return a new low-level dataset identifier for a virtual dataset """
+        """Return a new low-level dataset identifier for a virtual dataset"""
         ...
-    

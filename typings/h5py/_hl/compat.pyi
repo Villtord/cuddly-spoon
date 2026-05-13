@@ -11,7 +11,8 @@ if (1, 14, 4) <= hdf5_built_version_tuple < (1, 14, 6):
     WINDOWS_ENCODING = ...
 else:
     WINDOWS_ENCODING = ...
-def filename_encode(filename): # -> bytes:
+
+def filename_encode(filename):  # -> bytes:
     """
     Encode filename for use in the HDF5 library.
 
@@ -21,7 +22,7 @@ def filename_encode(filename): # -> bytes:
     """
     ...
 
-def filename_decode(filename): # -> str:
+def filename_decode(filename):  # -> str:
     """
     Decode filename used by HDF5 library.
 

@@ -204,7 +204,10 @@ def export_xps_data(region, filename):
     filename = filename.split(".")[0] + "_" + region_name + "_XPS.dat"
     filename = filename.replace(" ", "_")
     write_data_out(filename, title_list, zipped)
-    print(f"Data for region {region_name} written to file {filename}")
+    print(
+        f"Data for region {region_name} written to file\
+              {parsed_args.out_path}/{filename}"
+    )
 
 
 def write_data_out(filename: str, title_list: list[str], zipped: dict[str, Any]):
@@ -212,7 +215,7 @@ def write_data_out(filename: str, title_list: list[str], zipped: dict[str, Any])
     global filedir
     global parsed_args
 
-    output_path = os.path.join(filedir, filename)
+    output_path = os.path.join(parsed_args.out_path, filename)
     with open(output_path, "w") as output_file:
         writer = csv.writer(output_file, delimiter="\t")
         if not parsed_args.titles_off:
@@ -236,6 +239,10 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("filepath", help=("Full path to nxs file to convert"))
+
+    help_str = "enter the directory path where you want to save the converted data"
+    parser.add_argument("-out", "--out_path", default=None, help=help_str)
+
     parser.add_argument(
         "--titles_off", help="Switch OFF column titles", action="store_true"
     )
