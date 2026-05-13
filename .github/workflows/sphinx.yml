@@ -1,4 +1,8 @@
-name: Sphinx build and deploy
+
+
+
+ \
+     name: Sphinx build and deploy
 
 on:
   push:
@@ -37,3 +41,4 @@ jobs:
           github_token: ${{ secrets.REPO_GITHUB_TOKEN}}
           publish_dir: docs/_build/html
           publish_branch: gh-pages
+        
