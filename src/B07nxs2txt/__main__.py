@@ -88,11 +88,10 @@ def process_file(file_path):
     global counter_old
     global counter_new
 
-    
-    outpath=parsed_args.out_path
+    outpath = parsed_args.out_path
     print("\n" + "#" * 50)
     print(f"Processing file: {file_path}")
-	# Determine the Python version based on the main node
+    # Determine the Python version based on the main node
     main_node_new = is_main_node_new(file_path)
     if main_node_new is None:
         print(f"Skipping {file_path} due to missing main node.")
@@ -103,6 +102,7 @@ def process_file(file_path):
     else:
         run_script_with_python(file_path, SCRIPT_OLD, outpath)
         counter_old += 1
+
 
 def parse_scan_range(scan_range):
     s = scan_range.strip("[]")
@@ -116,6 +116,7 @@ def make_scan_list(scan_list_in, scan_range):
         scan_list_in.extend(add_scans)
     return scan_list_in
 
+
 def process_folder():
     """
     Processes all .nxs files in the folder.
@@ -127,7 +128,9 @@ def process_folder():
         return
     # Get all .nxs files
     scan_list = make_scan_list(parsed_args.scan_list, parsed_args.scan_range)
-    nxs_list_all = [file for file in os.listdir(parsed_args.path) if file.endswith(".nxs")]
+    nxs_list_all = [
+        file for file in os.listdir(parsed_args.path) if file.endswith(".nxs")
+    ]
     if len(scan_list) == 0:
         nxs_files = nxs_list_all
     else:
@@ -138,7 +141,7 @@ def process_folder():
     if not nxs_files:
         print(f"No .nxs files found in the folder {parsed_args.path}.")
         return
-    for nxs_file in nxs_files:	
+    for nxs_file in nxs_files:
         print(os.path.abspath(parsed_args.path))
         file_path = os.path.join(os.path.abspath(parsed_args.path), nxs_file)
         process_file(file_path)
@@ -155,16 +158,20 @@ def main(args: Sequence[str] | None = None) -> None:
         action="version",
         version=__version__,
     )
-    parser.add_argument("path", help=("Full path to nxs file or folder to convert files"))
+    parser.add_argument(
+        "path", help=("Full path to nxs file or folder to convert files")
+    )
     parser.add_argument(
         "--titles_off", help="Switch OFF column titles", action="store_true"
     )
-    
+
     help_str = "enter the directory path where you want to save the converted data"
     parser.add_argument("-out", "--out_path", default=None, help=help_str)
 
     help_str = "Separate scan numbers to be mapped into the log without brackets e.g 441124 441128"
-    parser.add_argument("-sl", "--scan_list", nargs="+", type=int, help=help_str,default=[])
+    parser.add_argument(
+        "-sl", "--scan_list", nargs="+", type=int, help=help_str, default=[]
+    )
 
     help_str = "Evenly spaced range of scans to be added to the log in the format [start,stop,step]"
     parser.add_argument("-sr", "--scan_range", help=help_str, default=[])
@@ -172,11 +179,11 @@ def main(args: Sequence[str] | None = None) -> None:
     parsed_args = parser.parse_args()
 
     if parsed_args.out_path is None:
-        parsed_args.out_path =  parsed_args.path
-    
+        parsed_args.out_path = parsed_args.path
+
     if not os.path.exists(parsed_args.out_path):
         os.mkdir(parsed_args.out_path)
-	# do conversion
+    # do conversion
     if os.path.isfile(parsed_args.path):
         process_file(parsed_args.path)
     else:

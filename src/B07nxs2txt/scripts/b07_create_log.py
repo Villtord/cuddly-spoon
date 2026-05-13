@@ -230,7 +230,7 @@ def save_log(dirpath: Path, outpath: Path, scan_list_in: list, scan_range: str):
     """
 
     scan_list = make_scan_list(scan_list_in, scan_range)
-    
+
     nxs_list_all = [file for file in os.listdir(dirpath) if file.endswith(".nxs")]
     if len(scan_list) == 0:
         nxs_list = nxs_list_all
@@ -239,8 +239,8 @@ def save_log(dirpath: Path, outpath: Path, scan_list_in: list, scan_range: str):
             file for file in nxs_list_all if any(str(num) in file for num in scan_list)
         ]
     nxs_list.sort()
-    firstscan = int(nxs_list[0].split('-')[-1].replace('.nxs',''))
-    outfile = make_out_file(dirpath, outpath,firstscan )
+    firstscan = int(nxs_list[0].split("-")[-1].replace(".nxs", ""))
+    outfile = make_out_file(dirpath, outpath, firstscan)
     progress_bar = Bar("Processing", max=len(nxs_list))
     with open(outfile, "w", encoding="utf-8") as f:
         for file_count, file in enumerate(nxs_list):
@@ -279,7 +279,9 @@ def main():
     parser.add_argument("-out", "--out_path", default=None, help=help_str)
 
     help_str = "Separate scan numbers to be mapped into the log without brackets e.g 441124 441128"
-    parser.add_argument("-sl", "--scan_list", nargs="+", type=int, help=help_str,default=[])
+    parser.add_argument(
+        "-sl", "--scan_list", nargs="+", type=int, help=help_str, default=[]
+    )
 
     help_str = "Evenly spaced range of scans to be added to the log in the format [start,stop,step]"
     parser.add_argument("-sr", "--scan_range", help=help_str, default=[])
