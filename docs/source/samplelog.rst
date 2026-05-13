@@ -90,3 +90,5 @@ this will print to the terminal all lines which contain the search string e.g.
     b07-122997  dummy_a 2025-10-15 08:27:18 Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented
     b07-122998  pgm_energy  2025-10-15 08:50:19 845.0   920.0   1   sm21b_x: -0.8708    sm21b_y: -2.054 sm21b_z: 9.969  N/A s4b_ygapsize : 0.025
     b07-122999  dummy_a 2025-10-15 08:56:46 Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented Not implemented
+
+
