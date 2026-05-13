@@ -31,4 +31,3 @@ Then use the following command options to start converting nexus files
 
     #to select scans 120 to 130
     cuddle /dls/b07/data/2025/si43348-1 -sr [120,130,1]
-
