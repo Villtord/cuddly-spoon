@@ -5,6 +5,7 @@ import subprocess
 import sys
 from argparse import ArgumentParser, Namespace
 from collections.abc import Sequence
+from pathlib import Path
 
 import h5py  # Assuming .nxs files are HDF5-compatible
 
@@ -181,6 +182,10 @@ def main(args: Sequence[str] | None = None) -> None:
     parser.add_argument("-sr", "--scan_range", help=help_str, default=[])
 
     parsed_args = parser.parse_args()
+
+    inpath = Path(parsed_args.path)
+    if not inpath.is_absolute():
+        parsed_args.path = os.getcwd() / inpath
 
     if parsed_args.out_path is None:
         parsed_args.out_path = parsed_args.path
